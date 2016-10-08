@@ -1,0 +1,28 @@
+{
+	"bridge": {
+		"name": "Homebridge",
+		"username": "CC:22:3D:E3:CE:30",
+		"port": 51826,
+		"pin": "031-45-154"
+	},
+
+	"description": "Configuration file for Controlling Mode Lighting NPU Scenes",
+
+	"accessories": [
+		{
+		"accessory": "modelighting",
+		"NPU_IP": "192.168.1.100",
+		"name": "Living Room",	
+		"on_cmd": "001",
+		"off_cmd": "002"
+		},
+
+		{
+		"accessory": "modelighting",
+		"NPU_IP": "192.168.1.100",
+		"name": "Kitchen",
+		"on_cmd": "003",
+		"off_cmd": "004"
+		}
+    ]
+}
