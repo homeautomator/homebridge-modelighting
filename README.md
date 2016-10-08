@@ -13,18 +13,18 @@ Configuration sample:
 
 "accessories": [
 	{
-		"accessory": "modelighting",
-		"NPU_IP": "192.168.1.100",
-		"name": "Living Room",
-		"on_cmd": "001",
-		"off_cmd": "002"
+	"accessory": "modelighting",
+	"NPU_IP": "192.168.1.100",
+	"name": "Living Room",
+	"on_cmd": "001",
+	"off_cmd": "002"
 	},
-		
+	
 	{
-		"accessory": "modelighting",
-		"NPU_IP": "192.168.1.100",
-		"name": "Kitchen",
-		"on_cmd": "003",
-		"off_cmd": "004"
+	"accessory": "modelighting",
+	"NPU_IP": "192.168.1.100",
+	"name": "Kitchen",
+	"on_cmd": "003",
+	"off_cmd": "004"
 	}
 ]
