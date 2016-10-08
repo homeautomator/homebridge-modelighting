@@ -1,4 +1,5 @@
-// Experimental Plugin - Working Version
+// Homebridge Plugin for Mode Lighting System using Remote Control Interface
+// Need to enhance with more error checking
 
 var Service, Characteristic;
 
@@ -7,20 +8,18 @@ module.exports = function (homebridge) {
     // Service and Characteristic are from hap-nodejs
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    console.log("Inside module.exports");
     homebridge.registerAccessory("homebridge-modelighting", "modelighting", ModeLightingAccessory);
 }
 
-function ModeLightingAccessory(log, config) {
+function ModeLightingAccessory (log, config) {
     this.log = log;
 
     // Get Room Name from config.json
     this.name = config["name"];
 
-    // Get Mode Lighting On/Off Scene Numbers for Room Name from config.json
-    this.on_cmd = config["on_cmd"];
-    this.off_cmd = config["off_cmd"];
-
+    // Get Mode Lighting On/Off Scene Numbers for Room Name and NPU IP Address from config.json
+    this.on_scene = config["on_scene"];
+    this.off_scene = config["off_scene"];
     this.NPU_IP = config["NPU_IP"];
 }
 
@@ -32,8 +31,6 @@ ModeLightingAccessory.prototype = {
 
         var connection = new telnet();
 
-        this.log ("Inside sceneRequest with parameters: " + NPU_IP + " scene: " + scene);
-
         var params = {
             host: this.NPU_IP,
             port: 22,
@@ -42,19 +39,22 @@ ModeLightingAccessory.prototype = {
             negotiationMandatory: false
         };
 
-        // Callback handler for close event
+        // Callback handler for close event, though have never seen this for NPU
         connection.on('close', function () {
             console.log('Connection to Mode NPU closed');
+            callback();
         });
 
-        // Callback handler for timeout event
+        // Callback handler for timeout event, though have never seen this for NPU
         connection.on('timeout', function () {
             console.log('Connection to Mode NPU timed out!');
+            callback(error);
         });
 
-        // Callback handler for ready event
+        // Callback handler for ready event, though have never seen this for NPU
         connection.on('ready', function () {
             console.log('Connection to Mode NPU is ready to receive data');
+            callback();
         });
 
         // Callback handler for connect event.  As Mode NPU Remote Control
@@ -65,7 +65,7 @@ ModeLightingAccessory.prototype = {
 
             scene = 'SCENE' + scene + 'GO';
 
-            console.log('Connected to Mode NPU and invoking ' + scene);
+            console.log('Connected to Mode NPU and about to send ' + scene);
 
             connection.send(scene);
 
@@ -76,8 +76,7 @@ ModeLightingAccessory.prototype = {
         });
 
         // Connect to Mode NPU Remote Control Port
-        this.log('Initiating connection to Mode NPU');
-
+        this.log ("Connecting to Mode NPU at IP address " + NPU_IP + "with scene: " + scene);
         connection.connect(params);
     },
 
@@ -88,11 +87,11 @@ ModeLightingAccessory.prototype = {
         var NPU_IP=this.NPU_IP;
 
         if (powerOn) {
-            scene = this.on_cmd;
-            this.log("Setting power state to on");
+            scene = this.on_scene;
+            this.log("Invoking on scene");
         } else {
-            scene = this.off_cmd;
-            this.log("Setting power state to off");
+            scene = this.off_scene;
+            this.log("Invoking off scene");
         }
 
         this.sceneRequest(scene, NPU_IP, function (error, stdout, stderr) {
