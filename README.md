@@ -3,10 +3,10 @@ homebridge-plugin for Mode Lighting eDinControl using Remote Control Interface
 
 # Installation
 
-    Install homebridge by following instructions <a href="https://github.com/nfarina/homebridge/wiki/Running-HomeBridge-on-a-Raspberry-Pi#install-homebridge-and-dependencies">here.</a>
+    Install homebridge by following instructions on homebridge github pages:
+		https://github.com/nfarina/homebridge/wiki/Running-HomeBridge-on-a-Raspberry-Pi#install-homebridge-and-dependencies
 
-	
-	Install this plugin using: sudo npm install -g homebridge-modelighting
+	Install this plugin from NPM using: sudo npm install -g homebridge-modelighting
 	
 	The development version of the plugin can also be installed from Github
 		sudo npm install -g homeautomator/homebridge-modelighting homebridge-modelighting
@@ -24,6 +24,14 @@ homebridge-plugin for Mode Lighting eDinControl using Remote Control Interface
 
 Configuration sample:
 
+"accessories": [{
+	"accessory": "modelighting",
+	"NPU_IP": "192.168.0.1",
+	"name": "Living Room",
+	"on_scene": "001",
+	"off_scene": "002"
+}
+]
 "accessories": [
 {
 "accessory": "modelighting",
