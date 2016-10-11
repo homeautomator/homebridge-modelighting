@@ -27,9 +27,6 @@ Configuration sample:
 "accessories": [
 {
 "accessory": "modelighting",
-"NPU_IP": "192.168.0.1",
-"name": "Living Room",
-"on_scene": "001",
-"off_scene": "002"
+"NPU_IP": "192.168.0.1"
 }
 ]
