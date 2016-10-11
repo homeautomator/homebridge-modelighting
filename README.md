@@ -27,6 +27,7 @@ Configuration sample:
 "accessories": [
 {
 "accessory": "modelighting",
+"kjkl": "jkjlk",
 "NPU_IP": "192.168.0.1"
 }
 ]
