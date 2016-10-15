@@ -39,23 +39,24 @@ ModeLightingAccessory.prototype = {
             negotiationMandatory: false
         };
 
-        // Callback handler for close event, though have never seen this for NPU
+        // Callback handler for error event
         connection.on('error', function () {
             console.log('Error in connecting');
+            connection.end();
         });
 
         // Callback handler for close event
         connection.on('close', function () {
             console.log('Connection to Mode NPU closed');
-            return -1;
         });
 
-        // Callback handler for timeout event, though have never seen this for NPU
+        // Callback handler for timeout event
         connection.on('timeout', function () {
             console.log('Connection to Mode NPU timed out!');
+            connection.end();
         });
 
-        // Callback handler for ready event, though have never seen this for NPU
+        // Callback handler for ready event
         connection.on('ready', function () {
             console.log('Connection to Mode NPU is ready to receive data');
         });
