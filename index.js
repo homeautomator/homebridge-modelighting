@@ -34,8 +34,7 @@ ModeLightingAccessory.prototype = {
         var params = {
             host: this.NPU_IP,
             port: 22,
-            shellPrompt: 'EVORDY',
-            timeout: 1000,
+            shellPrompt: '',
             negotiationMandatory: false
         };
 
@@ -53,31 +52,25 @@ ModeLightingAccessory.prototype = {
         // Callback handler for timeout event
         connection.on('timeout', function () {
             console.log('Connection to Mode NPU timed out!');
-            connection.end();
         });
 
         // Callback handler for ready event
         connection.on('ready', function () {
-            console.log('Connection to Mode NPU is ready to receive data');
-        });
-
-        // Callback handler for connect event.  As Mode NPU Remote Control
-        // does not have a login/password then this event is used to trigger
-        // sending data on the connection.
-
-        connection.on('connect', function () {
 
             scene = 'SCENE' + scene + 'GO';
+            console.log('Invoking ' + scene);
 
-            console.log('Connected to Mode NPU and about to send ' + scene);
-
-            connection.send(scene, function() {
-                console.log('Failed to send data');
+            connection.send(scene, null, function() {
+                console.log('Scene Sent to NPU Remote Control');
             });
 
             // Close connection immediately after sending data
             connection.end();
+        });
 
+        // Callback handler for connect event
+        connection.on('connect', function () {
+            console.log('Connected to Mode NPU.');
         });
 
         // Connect to Mode NPU Remote Control Port
