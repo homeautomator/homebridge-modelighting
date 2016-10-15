@@ -33,15 +33,16 @@ ModeLightingAccessory.prototype = {
 
         var params = {
             host: this.NPU_IP,
-            port: 22,
-            shellPrompt: '',
-            negotiationMandatory: false
+            port: 22,                       // Mode NPU Remote Control Port
+            shellPrompt: '',                // No Shell Prompt
+            negotiationMandatory: false     // Disable telnet negotiations
         };
 
         // Callback handler for error event
         connection.on('error', function () {
-            console.log('Error in connecting');
+            console.log('Error connecting to Mode NPU');
             connection.end();
+            callback();
         });
 
         // Callback handler for close event
@@ -67,7 +68,7 @@ ModeLightingAccessory.prototype = {
             // Close connection immediately after sending data
             connection.end();
 
-            callback();
+            callback(); // success
         });
 
         // Callback handler for connect event
@@ -83,16 +84,15 @@ ModeLightingAccessory.prototype = {
     setPowerState: function (powerOn, callback) {
 
         var scene;
-        var sceneResult = 0;
-
+       
         var NPU_IP = this.NPU_IP;
 
         if (powerOn) {
             scene = this.on_scene;
-            this.log("Invoking on scene");
+            this.log("Invoking On scene");
         } else {
             scene = this.off_scene;
-            this.log("Invoking off scene");
+            this.log("Invoking Off scene");
         }
 
         this.sceneRequest(scene, NPU_IP, callback);
