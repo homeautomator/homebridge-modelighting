@@ -11,7 +11,7 @@ module.exports = function (homebridge) {
     homebridge.registerAccessory("homebridge-modelighting", "modelighting", ModeLightingAccessory);
 }
 
-function ModeLightingAccessory (log, config) {
+function ModeLightingAccessory(log, config) {
     this.log = log;
 
     // Get Room Name from config.json
@@ -26,7 +26,7 @@ function ModeLightingAccessory (log, config) {
 ModeLightingAccessory.prototype = {
 
     sceneRequest: function (scene, NPU_IP, callback) {
-        
+
         var telnet = require('telnet-client');
 
         var connection = new telnet();
@@ -60,14 +60,14 @@ ModeLightingAccessory.prototype = {
             scene = 'SCENE' + scene + 'GO';
             console.log('Invoking ' + scene);
 
-            connection.send(scene, null, function() {
+            connection.send(scene, null, function () {
                 console.log('Scene Sent to NPU Remote Control');
             });
 
             // Close connection immediately after sending data
             connection.end();
 
-            callback();          
+            callback();
         });
 
         // Callback handler for connect event
@@ -76,16 +76,16 @@ ModeLightingAccessory.prototype = {
         });
 
         // Connect to Mode NPU Remote Control Port
-        this.log ("Connecting to Mode NPU at IP address " + NPU_IP + "with scene: " + scene);
+        this.log("Connecting to Mode NPU at IP address " + NPU_IP + "with scene: " + scene);
         connection.connect(params);
     },
 
     setPowerState: function (powerOn, callback) {
 
         var scene;
-        var sceneResult=0;
+        var sceneResult = 0;
 
-        var NPU_IP=this.NPU_IP;
+        var NPU_IP = this.NPU_IP;
 
         if (powerOn) {
             scene = this.on_scene;
@@ -96,7 +96,6 @@ ModeLightingAccessory.prototype = {
         }
 
         this.sceneRequest(scene, NPU_IP, callback);
-        // callback();
     },
 
     identify: function (callback) {
@@ -111,15 +110,15 @@ ModeLightingAccessory.prototype = {
         var informationService = new Service.AccessoryInformation();
 
         informationService
-			.setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
-			.setCharacteristic(Characteristic.Model, "NPU 1.3.0.99")
-			.setCharacteristic(Characteristic.SerialNumber, "");
+            .setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
+            .setCharacteristic(Characteristic.Model, "NPU 1.3.0.99")
+            .setCharacteristic(Characteristic.SerialNumber, "");
 
         var switchService = new Service.Switch(this.name);
 
         switchService
-			.getCharacteristic(Characteristic.On)
-			.on('set', this.setPowerState.bind(this));
+            .getCharacteristic(Characteristic.On)
+            .on('set', this.setPowerState.bind(this));
 
         return [switchService];
     }
