@@ -71,7 +71,9 @@ ModeLightingAccessory.prototype = {
 
             console.log('Connected to Mode NPU and about to send ' + scene);
 
-            connection.send(scene);
+            connection.send(scene, function() {
+                console.log('Failed to send data');
+            });
 
             // Close connection immediately after sending data
             connection.end();
