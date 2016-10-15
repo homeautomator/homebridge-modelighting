@@ -42,7 +42,7 @@ ModeLightingAccessory.prototype = {
         // Callback handler for close event, though have never seen this for NPU
         connection.on('close', function () {
             console.log('Connection to Mode NPU closed');
-            callback();
+            // callback();
         });
 
         // Callback handler for timeout event, though have never seen this for NPU
