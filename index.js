@@ -66,6 +66,8 @@ ModeLightingAccessory.prototype = {
 
             // Close connection immediately after sending data
             connection.end();
+
+            return 10;
         });
 
         // Callback handler for connect event
@@ -81,6 +83,7 @@ ModeLightingAccessory.prototype = {
     setPowerState: function (powerOn, callback) {
 
         var scene;
+        var sceneResult;
 
         var NPU_IP=this.NPU_IP;
 
@@ -92,16 +95,8 @@ ModeLightingAccessory.prototype = {
             this.log("Invoking off scene");
         }
 
-        this.sceneRequest(scene, NPU_IP);
-        // , function (error) {
-        //    if (error) {
-        //        this.log('Scene function failed!');
-        //        callback(error);
-        //    } else {
-        //        this.log('Scene function succeeded!');
-        //        callback();
-        //    }
-        //}.bind(this));
+        sceneResult = this.sceneRequest(scene, NPU_IP);
+        this.log(sceneResult);
         callback();
     },
 
