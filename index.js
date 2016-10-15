@@ -66,8 +66,6 @@ ModeLightingAccessory.prototype = {
 
             // Close connection immediately after sending data
             connection.end();
-
-            return 0;
         });
 
         // Callback handler for connect event
