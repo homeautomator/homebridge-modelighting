@@ -31,5 +31,14 @@ Configuration sample:
 	"name": "Living Room",
 	"on_scene": "001",
 	"off_scene": "002"
+	},
+
+	{
+	"accessory": "modelighting",
+	"NPU_IP": "192.168.0.1",
+	"name": "Kithcen",
+	"on_scene": "003",
+	"off_scene": "004"
 	}
+
 ]
