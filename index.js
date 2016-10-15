@@ -25,7 +25,7 @@ function ModeLightingAccessory (log, config) {
 
 ModeLightingAccessory.prototype = {
 
-    sceneRequest: function (scene, NPU_IP, callback) {
+    sceneRequest: function (scene, NPU_IP) {
         
         var telnet = require('telnet-client');
 
@@ -42,19 +42,16 @@ ModeLightingAccessory.prototype = {
         // Callback handler for close event, though have never seen this for NPU
         connection.on('close', function () {
             console.log('Connection to Mode NPU closed');
-            // callback();
         });
 
         // Callback handler for timeout event, though have never seen this for NPU
         connection.on('timeout', function () {
             console.log('Connection to Mode NPU timed out!');
-            callback(error);
         });
 
         // Callback handler for ready event, though have never seen this for NPU
         connection.on('ready', function () {
             console.log('Connection to Mode NPU is ready to receive data');
-            callback();
         });
 
         // Callback handler for connect event.  As Mode NPU Remote Control
@@ -72,7 +69,6 @@ ModeLightingAccessory.prototype = {
             // Close connection immediately after sending data
             connection.end();
 
-            callback(); // success
         });
 
         // Connect to Mode NPU Remote Control Port
@@ -94,16 +90,14 @@ ModeLightingAccessory.prototype = {
             this.log("Invoking off scene");
         }
 
-        this.sceneRequest(scene, NPU_IP, function (error, stdout, stderr) {
+        this.sceneRequest(scene, NPU_IP, function (error) {
             if (error) {
-                this.log('Scene function failed: %s', stderr);
-                // callback(error);
+                this.log('Scene function failed!');
+                callback(error);
             } else {
                 this.log('Scene function succeeded!');
-                // callback();
-                // this.log(stdout);
+                callback();
             }
-            callback();
         }.bind(this));
     },
 
