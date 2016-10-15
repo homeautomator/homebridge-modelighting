@@ -25,7 +25,7 @@ function ModeLightingAccessory (log, config) {
 
 ModeLightingAccessory.prototype = {
 
-    sceneRequest: function (scene, NPU_IP) {
+    sceneRequest: function (scene, NPU_IP, callback) {
         
         var telnet = require('telnet-client');
 
@@ -66,6 +66,8 @@ ModeLightingAccessory.prototype = {
 
             // Close connection immediately after sending data
             connection.end();
+
+            return 0;
         });
 
         // Callback handler for connect event
@@ -92,15 +94,17 @@ ModeLightingAccessory.prototype = {
             this.log("Invoking off scene");
         }
 
-        this.sceneRequest(scene, NPU_IP, function (error) {
-            if (error) {
-                this.log('Scene function failed!');
-                callback(error);
-            } else {
-                this.log('Scene function succeeded!');
-                callback();
-            }
-        }.bind(this));
+        this.sceneRequest(scene, NPU_IP);
+        // , function (error) {
+        //    if (error) {
+        //        this.log('Scene function failed!');
+        //        callback(error);
+        //    } else {
+        //        this.log('Scene function succeeded!');
+        //        callback();
+        //    }
+        //}.bind(this));
+        callback();
     },
 
     identify: function (callback) {
