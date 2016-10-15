@@ -97,12 +97,13 @@ ModeLightingAccessory.prototype = {
         this.sceneRequest(scene, NPU_IP, function (error, stdout, stderr) {
             if (error) {
                 this.log('Scene function failed: %s', stderr);
-                callback(error);
+                // callback(error);
             } else {
                 this.log('Scene function succeeded!');
-                callback();
+                // callback();
                 // this.log(stdout);
             }
+            callback();
         }.bind(this));
     },
 
