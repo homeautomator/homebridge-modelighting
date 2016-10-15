@@ -68,6 +68,8 @@ ModeLightingAccessory.prototype = {
             connection.end();
 
             sceneResult=10;
+
+            console.log(sceneResult);
         });
 
         // Callback handler for connect event
