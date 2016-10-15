@@ -99,7 +99,6 @@ ModeLightingAccessory.prototype = {
 
         this.sceneRequest(scene, NPU_IP, sceneResult);
         this.log(sceneResult);
-        this.log(error);
         callback();
     },
 
