@@ -25,7 +25,7 @@ function ModeLightingAccessory (log, config) {
 
 ModeLightingAccessory.prototype = {
 
-    sceneRequest: function (scene, NPU_IP, callback) {
+    sceneRequest: function (scene, NPU_IP) {
         
         var telnet = require('telnet-client');
 
