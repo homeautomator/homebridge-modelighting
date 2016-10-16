@@ -120,6 +120,6 @@ ModeLightingAccessory.prototype = {
             .getCharacteristic(Characteristic.On)
             .on('set', this.setPowerState.bind(this));
 
-        return [switchService];
+        return [informationService, switchService];
     }
 };
