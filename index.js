@@ -105,21 +105,27 @@ ModeLightingAccessory.prototype = {
 
     getServices: function () {
 
-        // you can OPTIONALLY create an information service if you wish to override
-        // the default values for things like serial number, model, etc.
+        // Use HomeKit types defined in HAP node JS
+
+        // Accessory Information Service
         var informationService = new Service.AccessoryInformation();
 
         informationService
             .setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
             .setCharacteristic(Characteristic.Model, "NPU 1.3.0.99")
             .setCharacteristic(Characteristic.SerialNumber, "");
-
+        
+        // Switch Service
         var switchService = new Service.Switch(this.name);
 
+        // link setPowerState to .on event
         switchService
             .getCharacteristic(Characteristic.On)
             .on('set', this.setPowerState.bind(this));
 
-        return [informationService, switchService];
+        // Blind Service
+        var blindService = new Service.WindowCovering(this.name);
+
+        return [informationService, switchService, blindService];
     }
 };
