@@ -11,7 +11,7 @@ module.exports = function (homebridge) {
     homebridge.registerAccessory("homebridge-modelighting", "modelighting", ModeLightingAccessory);
 }
 
-function ModeLightingAccessory(log, config) {
+function ModeLightingAccessory (log, config) {
     this.log = log;
 
     // Get Room Name from config.json
@@ -33,69 +33,83 @@ ModeLightingAccessory.prototype = {
 
         var params = {
             host: this.NPU_IP,
-            port: 22,                       // Mode NPU Remote Control Port
-            shellPrompt: '',                // No Shell Prompt
-            negotiationMandatory: false     // Disable telnet negotiations
+            port: 26,
+            shellPrompt: '!GATRDY;',
+            timeout: 1000,
+            negotiationMandatory: false
         };
 
-        // Callback handler for error event
-        connection.on('error', function () {
-            console.log('Error connecting to Mode NPU');
-            connection.end();
-            callback();
-        });
-
-        // Callback handler for close event
+        // Callback handler for close event, though have never seen this for NPU
         connection.on('close', function () {
             console.log('Connection to Mode NPU closed');
         });
 
-        // Callback handler for timeout event
+        // Callback handler for timeout event, though have never seen this for NPU
         connection.on('timeout', function () {
             console.log('Connection to Mode NPU timed out!');
         });
 
-        // Callback handler for ready event
+        // Callback handler for ready event, though have never seen this for NPU
         connection.on('ready', function () {
+            console.log('Connection to Mode NPU is ready to receive data');
+        });
 
-            scene = 'SCENE' + scene + 'GO';
-            console.log('Invoking ' + scene);
+        // Callback handler for connect event.  As Mode NPU Remote Control
+        // does not have a login/password then this event is used to trigger
+        // sending data on the connection.
 
-            connection.send(scene, null, function () {
-                console.log('Scene Sent to NPU Remote Control');
-            });
+        connection.on('connect', function () {
+
+            scene = '$SCNRECALL,' + scene + ';';
+
+             console.log('Connected to Mode NPU at IP address ' + NPU_IP + '.  Recalling scene: ' + scene);
+
+            // Send scene
+            connection.send(scene);
 
             // Close connection immediately after sending data
             connection.end();
-
-            callback(); // success
-        });
-
-        // Callback handler for connect event
-        connection.on('connect', function () {
-            console.log('Connected to Mode NPU.');
         });
 
         // Connect to Mode NPU Remote Control Port
-        this.log("Connecting to Mode NPU at IP address " + NPU_IP + "with scene: " + scene);
         connection.connect(params);
     },
 
     setPowerState: function (powerOn, callback) {
 
         var scene;
-       
-        var NPU_IP = this.NPU_IP;
+
+        var NPU_IP=this.NPU_IP;
 
         if (powerOn) {
             scene = this.on_scene;
-            this.log("Invoking On scene");
+            this.log("setPowerState: Invoking on scene");
         } else {
             scene = this.off_scene;
-            this.log("Invoking Off scene");
+            this.log("setPowerState: Invoking off scene");
         }
 
-        this.sceneRequest(scene, NPU_IP, callback);
+        this.sceneRequest(scene, NPU_IP, function (error, stdout, stderr) {
+            if (error) {
+                this.log('sceneRequest: Scene function failed: %s', stderr);
+                return(error);
+            } else {
+                this.log('sceneRequest: Scene function succeeded!');
+                return(0);
+                // this.log(stdout);
+            }
+        }.bind(this));
+
+        callback(null);
+
+        return(0);
+    },
+
+    getPowerState: function (callback) {
+
+	this.log('Setting initial power state to off');
+	callback(null, 0);
+	return(0);
     },
 
     identify: function (callback) {
@@ -105,27 +119,22 @@ ModeLightingAccessory.prototype = {
 
     getServices: function () {
 
-        // Use HomeKit types defined in HAP node JS
-
-        // Accessory Information Service
+        // you can OPTIONALLY create an information service if you wish to override
+        // the default values for things like serial number, model, etc.
         var informationService = new Service.AccessoryInformation();
 
         informationService
-            .setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
-            .setCharacteristic(Characteristic.Model, "NPU 1.3.0.99")
-            .setCharacteristic(Characteristic.SerialNumber, "");
-        
-        // Switch Service
+			.setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
+			.setCharacteristic(Characteristic.Model, "NPU SW000120.2.3.6.3")
+			.setCharacteristic(Characteristic.SerialNumber, "");
+
         var switchService = new Service.Switch(this.name);
 
-        // link setPowerState to .on event
         switchService
-            .getCharacteristic(Characteristic.On)
-            .on('set', this.setPowerState.bind(this));
+			.getCharacteristic(Characteristic.On)
+			.on('set', this.setPowerState.bind(this))
+			.on('get', this.getPowerState.bind(this));
 
-        // Blind Service
-        var blindService = new Service.WindowCovering(this.name);
-
-        return [informationService, switchService, blindService];
+        return [switchService];
     }
 };
