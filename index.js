@@ -1,5 +1,6 @@
 // Homebridge Plugin for Mode Lighting System using Remote Control Interface
 // Need to enhance with more error checking
+var request = require('request');
 
 var Service, Characteristic;
 
@@ -25,80 +26,29 @@ function ModeLightingAccessory (log, config) {
 
 ModeLightingAccessory.prototype = {
 
-    sceneRequest: function (scene, NPU_IP, callback) {
-
-        var telnet = require('telnet-client');
-
-        var connection = new telnet();
-
-        var params = {
-            host: this.NPU_IP,
-            port: 26,
-            shellPrompt: '!GATRDY;',
-            timeout: 1000,
-            negotiationMandatory: false
-        };
-
-        // Callback handler for close event, though have never seen this for NPU
-        connection.on('close', function () {
-            console.log('Connection to Mode NPU closed');
-        });
-
-        // Callback handler for timeout event, though have never seen this for NPU
-        connection.on('timeout', function () {
-            console.log('Connection to Mode NPU timed out!');
-        });
-
-        // Callback handler for ready event, though have never seen this for NPU
-        connection.on('ready', function () {
-            console.log('Connection to Mode NPU is ready to receive data');
-        });
-
-        // Callback handler for connect event.  As Mode NPU Remote Control
-        // does not have a login/password then this event is used to trigger
-        // sending data on the connection.
-
-        connection.on('connect', function () {
-
-            scene = '$SCNRECALL,' + scene + ';';
-
-             console.log('Connected to Mode NPU at IP address ' + NPU_IP + '.  Recalling scene: ' + scene);
-
-            // Send scene
-            connection.send(scene);
-
-            // Close connection immediately after sending data
-            connection.end();
-        });
-
-        // Connect to Mode NPU Remote Control Port
-        connection.connect(params);
-    },
-
     setPowerState: function (powerOn, callback) {
 
-        var scene;
+      var scene;
 
-        var NPU_IP=this.NPU_IP;
+      var NPU_IP=this.NPU_IP;
 
-        if (powerOn) {
-            scene = this.on_scene;
-            this.log("setPowerState: Invoking on scene");
-        } else {
-            scene = this.off_scene;
-            this.log("setPowerState: Invoking off scene");
-        }
+      if (powerOn) {
+        scene = this.on_scene;
+        this.log("setPowerState: Invoking on scene");
+      } else {
+        scene = this.off_scene;
+        this.log("setPowerState: Invoking off scene");
+      }
 
-        this.sceneRequest(scene, NPU_IP, function (error, stdout, stderr) {
-            if (error) {
-                this.log('sceneRequest: Scene function failed: %s', stderr);
-                return(error);
-            } else {
-                this.log('sceneRequest: Scene function succeeded!');
-                return(0);
-                // this.log(stdout);
+      request.post(
+        'http://'+NPU_IP+'/gateway?',
+          { json: { contentType: 'text/plain', dataType: 'text', data: '$scnrecall,'+scene+';'} },
+          function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+               console.log(body);
             }
-        }.bind(this));
+          }
+        );
 
         callback(null);
 
@@ -107,9 +57,25 @@ ModeLightingAccessory.prototype = {
 
     getPowerState: function (callback) {
 
-	this.log('Setting initial power state to off');
-	callback(null, 0);
-	return(0);
+      var scene=this.on_scene;
+
+      var NPU_IP=this.NPU_IP;
+
+      request.post(
+        'http://'+NPU_IP+'/gateway?',
+        { json: { contentType: 'text/plain', dataType: 'text', data: '?scn,'+scene+';'} },
+          function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                console.log(body);
+            }
+
+	  // Get Light Status & Return through callback
+          var pos = body.lastIndexOf(";");
+          callback(null,body.substring(pos-5,pos-4));
+          }
+      );
+
+      return(0);
     },
 
     identify: function (callback) {
@@ -123,18 +89,18 @@ ModeLightingAccessory.prototype = {
         // the default values for things like serial number, model, etc.
         var informationService = new Service.AccessoryInformation();
 
-        informationService
+      informationService
 			.setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
 			.setCharacteristic(Characteristic.Model, "NPU SW000120.2.3.6.3")
 			.setCharacteristic(Characteristic.SerialNumber, "");
 
-        var switchService = new Service.Switch(this.name);
+      var switchService = new Service.Switch(this.name);
 
-        switchService
+      switchService
 			.getCharacteristic(Characteristic.On)
 			.on('set', this.setPowerState.bind(this))
 			.on('get', this.getPowerState.bind(this));
 
-        return [switchService];
+      return [switchService];
     }
 };

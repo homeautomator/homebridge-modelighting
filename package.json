@@ -1,33 +1,33 @@
 {
   "name": "homebridge-modelighting",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Homebridge Plugin for Mode Lighting",
   "main": "index.js",
-  
+
   "dependencies": {
-    "telnet-client": "^0.10.6"
+    "request": "^=2.88.0"
     },
-  
+
   "devDependencies": {},
-  
+
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
     },
-  
+
   "repository": {
     "type": "git",
     "url": "https://github.com/homeautomator/homebridge-modelighting/"
     },
-  
+
   "keywords": [
     "homebridge-plugin"
     ],
-  
+
   "engines": {
     "node": ">=0.12.0",
     "homebridge": ">=0.2.0"
     },
-  
+
   "author": "homeautomator",
   "license": "ISC"
 }
