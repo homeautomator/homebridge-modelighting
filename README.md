@@ -17,7 +17,7 @@ homebridge-plugin for Mode Lighting eDinControl using Remote Control Interface
 # Getting Your Scene Information
 	Scene numbers can be identified by navigating to the eDin Control
 	configuration page on NPU and then hovering the mouse over each number
-	above the scene name.  It will read Rs232: SCENEXXXGO where XXX is
+	above the scene name.  It will read Rs232: $SCNRECALL,XXXXX; where XXXXX is
 	the scene number.
 
 # Configuration
@@ -29,14 +29,14 @@ Configuration sample:
 			"accessory": "modelighting",
 			"NPU_IP": "192.168.0.1",
 			"name": "Living Room",
-			"on_cmd": "001",
-			"off_cmd": "002"
+			"on_scene": "001",
+			"off_scene": "002"
 		},
 		{
 			"accessory": "modelighting",
 			"NPU_IP": "192.168.0.1",
 			"name": "Kitchen",
-			"on_cmd": "003",
-			"off_cmd": "004"
+			"on_scene": "003",
+			"off_scene": "004"
 		}
 	]
