@@ -11,15 +11,15 @@
 			"accessory": "modelighting",
 			"NPU_IP": "192.168.0.1",
 			"name": "Living Room",
-			"on_cmd": "001",
-			"off_cmd": "002"
+			"on_scene": "001",
+			"off_scene": "002"
 		},
 		{
 			"accessory": "modelighting",
 			"NPU_IP": "192.168.0.1",
 			"name": "Kitchen",
-			"on_cmd": "003",
-			"off_cmd": "004"
+			"on_scene": "003",
+			"off_scene": "004"
 		}
 	]
 }
