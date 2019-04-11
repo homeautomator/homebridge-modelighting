@@ -73,6 +73,7 @@ ModeLightingAccessory.prototype = {
         json: {
           contentType: 'text/plain',
           dataType: 'text',
+					timeout: 1500,
           data: '?scn,' + scene + ';'
         }
       },
@@ -85,9 +86,10 @@ ModeLightingAccessory.prototype = {
         if (!error && response.statusCode == 200) {
           console.log(body);
         }
-				
+
         if (body == null) {
-          console.log('body is null');
+          console.log('Body is null');
+					console.log('Error Code is: '+error.code)
         } else if (body != "") {
           // Get Light Status & Return through callback
           var pos = body.lastIndexOf(";");
