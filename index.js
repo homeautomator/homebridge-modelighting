@@ -24,6 +24,12 @@ function ModeLightingAccessory(log, config) {
   this.on_scene = config["on_scene"];
   this.off_scene = config["off_scene"];
   this.NPU_IP = config["NPU_IP"];
+
+  if (!this.name || !this.on_scene || !this.off_scene || !this.NPU_IP) {
+    this.log('Invalid entry in config.json');
+    this.log('NPU Address is ' + this.NPU_IP + ' Name is ' + this.name +
+      ' On Scene is ' + this.on_scene + 'Off Scene is ' + this.off_scene);
+  }
 }
 
 ModeLightingAccessory.prototype = {
@@ -31,16 +37,15 @@ ModeLightingAccessory.prototype = {
   setPowerState: function(powerOn, callback) {
 
     var scene;
-
     var NPU_IP = this.NPU_IP;
 
     if (powerOn) {
       scene = this.on_scene;
-      this.log("setPowerState: Invoking on scene");
     } else {
       scene = this.off_scene;
-      this.log("setPowerState: Invoking off scene");
     }
+
+    this.log('Recalling Scene: ' + scene);
 
     request.post(
       'http://' + NPU_IP + '/gateway?', {
@@ -65,42 +70,55 @@ ModeLightingAccessory.prototype = {
   getPowerState: function(callback) {
 
     var scene = this.on_scene;
-
     var NPU_IP = this.NPU_IP;
+    var cntr = 0;
 
-    request.post(
-      'http://' + NPU_IP + '/gateway?', {
-        json: {
-          contentType: 'text/plain',
-          dataType: 'text',
-          timeout: 1500,
-          data: '?scn,' + scene + ';'
-        }
-      },
-      function(error, response, body) {
+    function getPowerStateRetry() {
 
-        console.log('getPowerState: Error is: ' + error);
-        if (error != null) {
-          console.log('getPowerState: Error Code is: ' + error.code);
-        }
-        console.log('getPowerState: Response is: ' + response);
-        console.log('getPowerState: Body is: ' + body);
+      request.post(
+        'http://' + NPU_IP + '/gateway?', {
+          json: {
+            contentType: 'text/plain',
+            dataType: 'text',
+            timeout: 1500,
+            data: '?scn,' + scene + ';'
+          }
+        },
+        function(error, response, body) {
 
-        if (!error && response.statusCode == 200) {
-          console.log(body);
-        }
+          ++cntr;
 
-        if (body == null) {
-          console.log('Body is null');
-        } else if (body != "") {
-          // Get Light Status & Return through callback
-          var pos = body.lastIndexOf(";");
-          callback(null, body.substring(pos - 5, pos - 4));
-        } else {
-          console.log('Body from webserver was blank!');
-        }
-      }
-    );
+          console.log('getPowerStateRetry: Scene: ' + scene + ', Attempt number to get light status: ' + cntr);
+
+          if (error) {
+
+            console.log('getPowerStateRetry: WebServer Response Error is: ' + error);
+            console.log('getPowerStateRetry: Error Code is: ' + error.code);
+
+            if (cntr >= 5) {
+              // if it fails too many times, just send out light is off
+              console.log('getPowerStateRetry: Scene: ' + scene + ', unable to get light status.  Send HomeKit default Off');
+              callback(null, 0);
+            } else {
+              // try again after a delay
+              setTimeout(getPowerStateRetry, 500);
+            }
+          } else {
+
+            if (body != "") {
+              // Get Light Status & Return through callback
+              var pos = body.lastIndexOf(";");
+              callback(null, body.substring(pos - 5, pos - 4));
+            } else {
+              console.log('getPowerStateRetry: Error - Unexpected body from WebServer. Body is: ' + body);
+              callback(null, 0); // Default to Off
+            } // Inner else
+          } // Outer else
+        } // function
+      );
+    }
+
+    getPowerStateRetry();
 
     return (0);
   },
