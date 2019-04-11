@@ -1,25 +1,24 @@
 {
-	"bridge": {
-		"name": "Homebridge",
-		"username": "CC:22:3D:E3:CE:30",
-		"port": 51826,
-		"pin": "031-45-154"
-	},
-	"description": "Configuration file for Controlling Mode Lighting NPU Scenes",
-	"accessories": [
-		{
-			"accessory": "modelighting",
-			"NPU_IP": "192.168.0.1",
-			"name": "Living Room",
-			"on_scene": "001",
-			"off_scene": "002"
-		},
-		{
-			"accessory": "modelighting",
-			"NPU_IP": "192.168.0.1",
-			"name": "Kitchen",
-			"on_scene": "003",
-			"off_scene": "004"
-		}
-	]
+  "bridge": {
+    "name": "Homebridge",
+    "username": "CC:22:3D:E3:CE:30",
+    "port": 51826,
+    "pin": "031-45-154"
+  },
+  "description": "Configuration file for Controlling Mode Lighting NPU Scenes",
+  "accessories": [{
+      "accessory": "modelighting",
+      "NPU_IP": "192.168.0.1",
+      "name": "Living Room",
+      "on_scene": "001",
+      "off_scene": "002"
+    },
+    {
+      "accessory": "modelighting",
+      "NPU_IP": "192.168.0.1",
+      "name": "Kitchen",
+      "on_scene": "003",
+      "off_scene": "004"
+    }
+  ]
 }
