@@ -73,14 +73,16 @@ ModeLightingAccessory.prototype = {
         json: {
           contentType: 'text/plain',
           dataType: 'text',
-					timeout: 1500,
+          timeout: 1500,
           data: '?scn,' + scene + ';'
         }
       },
       function(error, response, body) {
 
         console.log('getPowerState: Error is: ' + error);
-				console.log('getPowerState: Error Code is: ' + error.code)
+        if (error != null) {
+          console.log('getPowerState: Error Code is: ' + error.code);
+        }
         console.log('getPowerState: Response is: ' + response);
         console.log('getPowerState: Body is: ' + body);
 
