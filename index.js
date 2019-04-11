@@ -28,99 +28,100 @@ function ModeLightingAccessory(log, config) {
 
 ModeLightingAccessory.prototype = {
 
-    setPowerState: function(powerOn, callback) {
+  setPowerState: function(powerOn, callback) {
 
-      var scene;
+    var scene;
 
-      var NPU_IP = this.NPU_IP;
+    var NPU_IP = this.NPU_IP;
 
-      if (powerOn) {
-        scene = this.on_scene;
-        this.log("setPowerState: Invoking on scene");
-      } else {
-        scene = this.off_scene;
-        this.log("setPowerState: Invoking off scene");
+    if (powerOn) {
+      scene = this.on_scene;
+      this.log("setPowerState: Invoking on scene");
+    } else {
+      scene = this.off_scene;
+      this.log("setPowerState: Invoking off scene");
+    }
+
+    request.post(
+      'http://' + NPU_IP + '/gateway?', {
+        json: {
+          contentType: 'text/plain',
+          dataType: 'text',
+          data: '$scnrecall,' + scene + ';'
+        }
+      },
+      function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          console.log(body);
+        }
       }
+    );
 
-      request.post(
-        'http://' + NPU_IP + '/gateway?', {
-          json: {
-            contentType: 'text/plain',
-            dataType: 'text',
-            data: '$scnrecall,' + scene + ';'
-          }
-        },
-        function(error, response, body) {
-          if (!error && response.statusCode == 200) {
-            console.log(body);
-          }
+    callback(null);
+
+    return (0);
+  },
+
+  getPowerState: function(callback) {
+
+    var scene = this.on_scene;
+
+    var NPU_IP = this.NPU_IP;
+
+    request.post(
+      'http://' + NPU_IP + '/gateway?', {
+        json: {
+          contentType: 'text/plain',
+          dataType: 'text',
+          data: '?scn,' + scene + ';'
         }
-      );
+      },
+      function(error, response, body) {
 
-      callback(null);
+        console.log('getPowerState: Error is: ' + error);
+        console.log('getPowerState: Response is: ' + response);
+        console.log('getPowerState: Body is: ' + body);
 
-      return (0);
-    },
-
-    getPowerState: function(callback) {
-
-      var scene = this.on_scene;
-
-      var NPU_IP = this.NPU_IP;
-
-      request.post(
-          'http://' + NPU_IP + '/gateway?', {
-            json: {
-              contentType: 'text/plain',
-              dataType: 'text',
-              data: '?scn,' + scene + ';'
-            }
-          },
-          function(error, response, body) {
-
-            console.log('getPowerState: Error is: ' + error);
-            console.log('getPowerState: Response is: ' + response);
-            console.log('getPowerState: Body is: ' + body);
-
-            if (!error && response.statusCode == 200) {
-              console.log(body);
-            }
-
-            if (body != "") {
-              // Get Light Status & Return through callback
-              var pos = body.lastIndexOf(";");
-              callback(null, body.substring(pos - 5, pos - 4));
-            } else {
-              console.log('Body from webserver was blank!');
-            }
-          );
-
-          return (0);
-        },
-
-        identify: function(callback) {
-          this.log("identify: Identify requested!");
-          callback(); // success
-        },
-
-        getServices: function() {
-
-          // you can OPTIONALLY create an information service if you wish to override
-          // the default values for things like serial number, model, etc.
-          var informationService = new Service.AccessoryInformation();
-
-          informationService
-            .setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
-            .setCharacteristic(Characteristic.Model, "NPU SW000120.2.3.6.3")
-            .setCharacteristic(Characteristic.SerialNumber, "");
-
-          var switchService = new Service.Switch(this.name);
-
-          switchService
-            .getCharacteristic(Characteristic.On)
-            .on('set', this.setPowerState.bind(this))
-            .on('get', this.getPowerState.bind(this));
-
-          return [switchService];
+        if (!error && response.statusCode == 200) {
+          console.log(body);
         }
-    };
+
+        if (body != "") {
+          // Get Light Status & Return through callback
+          var pos = body.lastIndexOf(";");
+          callback(null, body.substring(pos - 5, pos - 4));
+        } else {
+          console.log('Body from webserver was blank!');
+        }
+      }
+    );
+
+    return (0);
+  },
+
+  identify: function(callback) {
+    this.log("identify: Identify requested!");
+    callback(); // success
+  },
+
+  getServices: function() {
+
+    // you can OPTIONALLY create an information service if you wish to override
+    // the default values for things like serial number, model, etc.
+    var informationService = new Service.AccessoryInformation();
+
+    informationService
+      .setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
+      .setCharacteristic(Characteristic.Model, "NPU SW000120.2.3.6.3")
+      .setCharacteristic(Characteristic.SerialNumber, "");
+
+    var switchService = new Service.Switch(this.name);
+
+    switchService
+      .getCharacteristic(Characteristic.On)
+      .on('set', this.setPowerState.bind(this))
+      .on('get', this.getPowerState.bind(this));
+
+    return [switchService];
+  }
+};
