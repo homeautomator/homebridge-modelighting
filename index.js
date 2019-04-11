@@ -9,7 +9,8 @@ module.exports = function(homebridge) {
   // Service and Characteristic are from hap-nodejs
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerAccessory("homebridge-modelighting", "modelighting", ModeLightingAccessory);
+  homebridge.registerAccessory("homebridge-modelighting", "modelighting",
+    ModeLightingAccessory);
 }
 
 function ModeLightingAccessory(log, config) {
@@ -18,7 +19,8 @@ function ModeLightingAccessory(log, config) {
   // Get Room Name from config.json
   this.name = config["name"];
 
-  // Get Mode Lighting On/Off Scene Numbers for Room Name and NPU IP Address from config.json
+  // Get Mode Lighting On/Off Scene Numbers for Room Name and
+  // NPU IP Address from config.json
   this.on_scene = config["on_scene"];
   this.off_scene = config["off_scene"];
   this.NPU_IP = config["NPU_IP"];
@@ -75,13 +77,20 @@ ModeLightingAccessory.prototype = {
         }
       },
       function(error, response, body) {
+
+        console.log('getPowerState: Error is: ' + error);
+        console.log('getPowerState: Response is: ' + response);
+        console.log('getPowerState: Body is: ' + body);
+
         if (!error && response.statusCode == 200) {
           console.log(body);
         }
 
-        // Get Light Status & Return through callback
-        var pos = body.lastIndexOf(";");
-        callback(null, body.substring(pos - 5, pos - 4));
+        if (body != "") {
+          // Get Light Status & Return through callback
+          var pos = body.lastIndexOf(";");
+          callback(null, body.substring(pos - 5, pos - 4));
+        }
       }
     );
 
@@ -89,7 +98,7 @@ ModeLightingAccessory.prototype = {
   },
 
   identify: function(callback) {
-    this.log("Identify requested!");
+    this.log("identify: Identify requested!");
     callback(); // success
   },
 
