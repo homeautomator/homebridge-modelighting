@@ -1,6 +1,6 @@
 {
   "name": "homebridge-modelighting",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Homebridge Plugin for Mode Lighting",
   "main": "index.js",
 
