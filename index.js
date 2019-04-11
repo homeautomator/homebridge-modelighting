@@ -64,11 +64,11 @@ ModeLightingAccessory.prototype = {
 
     getPowerState: function(callback) {
 
-        var scene = this.on_scene;
+      var scene = this.on_scene;
 
-        var NPU_IP = this.NPU_IP;
+      var NPU_IP = this.NPU_IP;
 
-        request.post(
+      request.post(
           'http://' + NPU_IP + '/gateway?', {
             json: {
               contentType: 'text/plain',
@@ -93,33 +93,34 @@ ModeLightingAccessory.prototype = {
             } else {
               console.log('Body from webserver was blank!');
             }
+          );
 
-            return (0);
-          },
+          return (0);
+        },
 
-          identify: function(callback) {
-            this.log("identify: Identify requested!");
-            callback(); // success
-          },
+        identify: function(callback) {
+          this.log("identify: Identify requested!");
+          callback(); // success
+        },
 
-          getServices: function() {
+        getServices: function() {
 
-            // you can OPTIONALLY create an information service if you wish to override
-            // the default values for things like serial number, model, etc.
-            var informationService = new Service.AccessoryInformation();
+          // you can OPTIONALLY create an information service if you wish to override
+          // the default values for things like serial number, model, etc.
+          var informationService = new Service.AccessoryInformation();
 
-            informationService
-              .setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
-              .setCharacteristic(Characteristic.Model, "NPU SW000120.2.3.6.3")
-              .setCharacteristic(Characteristic.SerialNumber, "");
+          informationService
+            .setCharacteristic(Characteristic.Manufacturer, "Mode Lighting")
+            .setCharacteristic(Characteristic.Model, "NPU SW000120.2.3.6.3")
+            .setCharacteristic(Characteristic.SerialNumber, "");
 
-            var switchService = new Service.Switch(this.name);
+          var switchService = new Service.Switch(this.name);
 
-            switchService
-              .getCharacteristic(Characteristic.On)
-              .on('set', this.setPowerState.bind(this))
-              .on('get', this.getPowerState.bind(this));
+          switchService
+            .getCharacteristic(Characteristic.On)
+            .on('set', this.setPowerState.bind(this))
+            .on('get', this.getPowerState.bind(this));
 
-            return [switchService];
-          }
-        };
+          return [switchService];
+        }
+    };
