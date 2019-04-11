@@ -1,5 +1,6 @@
 // Homebridge Plugin for Mode Lighting System using Remote Control Interface
 // Need to enhance with more error checking
+
 var request = require('request');
 
 var Service, Characteristic;
@@ -16,14 +17,12 @@ module.exports = function(homebridge) {
 function ModeLightingAccessory(log, config) {
   this.log = log;
 
-  // Get Room Name from config.json
+  // Get config.json informatio for NPU IP Address, Room Name,
+  // On Scene Number and Off Scene Number
+  this.NPU_IP = config["NPU_IP"];
   this.name = config["name"];
-
-  // Get Mode Lighting On/Off Scene Numbers for Room Name and
-  // NPU IP Address from config.json
   this.on_scene = config["on_scene"];
   this.off_scene = config["off_scene"];
-  this.NPU_IP = config["NPU_IP"];
 
   if (!this.name || !this.on_scene || !this.off_scene || !this.NPU_IP) {
     this.log('Invalid entry in config.json');
@@ -32,95 +31,73 @@ function ModeLightingAccessory(log, config) {
   }
 }
 
-ModeLightingAccessory.prototype = {
+function ModeInterface(NPU_IP, cmd, scene, callback) {
 
-  setPowerState: function(powerOn, callback) {
+  var cntr = 0;
 
-    var scene;
-    var NPU_IP = this.NPU_IP;
-
-    if (powerOn) {
-      scene = this.on_scene;
-    } else {
-      scene = this.off_scene;
-    }
-
-    this.log('Recalling Scene: ' + scene);
+  function ModeInterfaceRetry(NPU_IP, cmd, scene, callback) {
 
     request.post(
       'http://' + NPU_IP + '/gateway?', {
         json: {
           contentType: 'text/plain',
           dataType: 'text',
-          data: '$scnrecall,' + scene + ';'
+          timeout: 1500,
+          data: cmd + scene + ';'
         }
       },
       function(error, response, body) {
-        if (!error && response.statusCode == 200) {
-          console.log(body);
-        }
-      }
-    );
 
-    callback(null);
+        ++cntr;
 
-    return (0);
-  },
+        console.log('NPU: ' + NPU_IP + ' cmd: ' + cmd + ' scene: ' + scene +
+          ' attempt number: ' + cntr);
+
+        if (error) {
+
+          console.log('WebServer Response is: ' + error);
+          console.log('Error Code is: ' + error.code);
+
+          if (cntr >= 5) {
+            // if it fails too many times then return
+            console.log('cmd: ' + cmd + ' scene: ' + scene +
+              ' - unable to communicate to with Mode NPU WebServer');
+            callback(null, 0);
+          } else {
+            // try again after a delay
+            setTimeout(ModeInterfaceRetry, 500, NPU_IP, cmd, scene, callback);
+          }
+        } // Error
+        else {
+
+          if (cmd == "$scnrecall,") {
+            callback(null, 0);
+          } else if (cmd == "?scn," && body != "") {
+            // Get Light Status & Return through callback
+            var pos = body.lastIndexOf(";");
+            callback(null, body.substring(pos - 5, pos - 4));
+          } else {
+            console.log('Unexpected body from WebServer. Body is: ' + body);
+            callback(null, 0); // Default to Off
+          } // Inner else
+        } // else
+      } // request.post callback function
+    ); // request.post function call
+  } // ModeInterfaceRetry
+
+  ModeInterfaceRetry(NPU_IP, cmd, scene, callback);
+
+} // ModeInterface
+
+ModeLightingAccessory.prototype = {
 
   getPowerState: function(callback) {
+    ModeInterface(this.NPU_IP, "?scn,", this.on_scene, callback);
+  },
 
-    var scene = this.on_scene;
-    var NPU_IP = this.NPU_IP;
-    var cntr = 0;
-
-    function getPowerStateRetry() {
-
-      request.post(
-        'http://' + NPU_IP + '/gateway?', {
-          json: {
-            contentType: 'text/plain',
-            dataType: 'text',
-            timeout: 1500,
-            data: '?scn,' + scene + ';'
-          }
-        },
-        function(error, response, body) {
-
-          ++cntr;
-
-          console.log('getPowerStateRetry: Scene: ' + scene + ', Attempt number to get light status: ' + cntr);
-
-          if (error) {
-
-            console.log('getPowerStateRetry: WebServer Response Error is: ' + error);
-            console.log('getPowerStateRetry: Error Code is: ' + error.code);
-
-            if (cntr >= 5) {
-              // if it fails too many times, just send out light is off
-              console.log('getPowerStateRetry: Scene: ' + scene + ', unable to get light status.  Send HomeKit default Off');
-              callback(null, 0);
-            } else {
-              // try again after a delay
-              setTimeout(getPowerStateRetry, 500);
-            }
-          } else {
-
-            if (body != "") {
-              // Get Light Status & Return through callback
-              var pos = body.lastIndexOf(";");
-              callback(null, body.substring(pos - 5, pos - 4));
-            } else {
-              console.log('getPowerStateRetry: Error - Unexpected body from WebServer. Body is: ' + body);
-              callback(null, 0); // Default to Off
-            } // Inner else
-          } // Outer else
-        } // function
-      );
-    }
-
-    getPowerStateRetry();
-
-    return (0);
+  setPowerState: function(powerOn, callback) {
+    ModeInterface(this.NPU_IP, "$scnrecall,",
+      powerOn ? this.on_scene : this.off_scene, callback);
   },
 
   identify: function(callback) {
