@@ -82,7 +82,7 @@ ModeLightingAccessory.prototype = {
         console.log('getPowerState: Error is: ' + error);
 				console.log('getPowerState: Error Code is: ' + error.code);
         console.log('getPowerState: Response is: ' + response);
-				console.log('getPowerState: Response Status is: ' + response.statusCode);
+				// console.log('getPowerState: Response Status is: ' + response.statusCode);
         console.log('getPowerState: Body is: ' + body);
 
         if (!error && response.statusCode == 200) {
