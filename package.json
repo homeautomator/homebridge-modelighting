@@ -6,27 +6,27 @@
 
   "dependencies": {
     "request": "^=2.88.0"
-    },
+  },
 
   "devDependencies": {},
 
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-    },
+  },
 
   "repository": {
     "type": "git",
     "url": "https://github.com/homeautomator/homebridge-modelighting/"
-    },
+  },
 
   "keywords": [
     "homebridge-plugin"
-    ],
+  ],
 
   "engines": {
     "node": ">=0.12.0",
     "homebridge": ">=0.2.0"
-    },
+  },
 
   "author": "homeautomator",
   "license": "ISC"
