@@ -80,7 +80,9 @@ ModeLightingAccessory.prototype = {
       function(error, response, body) {
 
         console.log('getPowerState: Error is: ' + error);
+				console.log('getPowerState: Error Code is: ' + error.code);
         console.log('getPowerState: Response is: ' + response);
+				console.log('getPowerState: Response Status is: ' + response.statusCode);
         console.log('getPowerState: Body is: ' + body);
 
         if (!error && response.statusCode == 200) {
@@ -89,7 +91,7 @@ ModeLightingAccessory.prototype = {
 
         if (body == null) {
           console.log('Body is null');
-					console.log('Error Code is: '+error.code)
+					console.log('Error Code is: '+ error.code)
         } else if (body != "") {
           // Get Light Status & Return through callback
           var pos = body.lastIndexOf(";");
