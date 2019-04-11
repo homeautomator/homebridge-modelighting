@@ -85,8 +85,10 @@ ModeLightingAccessory.prototype = {
         if (!error && response.statusCode == 200) {
           console.log(body);
         }
-
-        if (body != "") {
+				
+        if (body == null) {
+          console.log('body is null');
+        } else if (body != "") {
           // Get Light Status & Return through callback
           var pos = body.lastIndexOf(";");
           callback(null, body.substring(pos - 5, pos - 4));
