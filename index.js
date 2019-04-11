@@ -91,9 +91,8 @@ ModeLightingAccessory.prototype = {
               var pos = body.lastIndexOf(";");
               callback(null, body.substring(pos - 5, pos - 4));
             } else {
-              console.log('Body from webserver was blank!);}
-              }
-            );
+              console.log('Body from webserver was blank!');
+            }
 
             return (0);
           },
